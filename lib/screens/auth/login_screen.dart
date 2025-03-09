@@ -19,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       print("Logging in with: $studentId, $password");
+      Navigator.pushNamed(context, '/edit_profile');
     }
   }
 
