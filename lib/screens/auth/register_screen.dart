@@ -5,6 +5,8 @@ import 'package:login/widgets/auth/auth_dropdown.dart';
 import 'package:login/widgets/auth/auth_radio.dart';
 import 'package:login/widgets/auth/auth_text_field.dart';
 import 'package:login/widgets/auth/auth_title.dart';
+import '../../services/auth_service.dart';
+import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -21,6 +23,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
+  final AuthService _authService = AuthService();
+
+  void _register() async {
+    String message = await _authService.registerUser(
+        _nameController.text,
+        _selectedGender,
+        _emailController.text,
+        _studentIdController.text,
+        _selectedLevel,
+        _passwordController.text,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    if (message == "User registered successfully!") {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginScreen()));
+    }
+  }
+
   String _selectedGender = "";
   String _selectedLevel = "";
 
@@ -35,6 +54,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       // Form is valid, retrieve values
@@ -43,11 +63,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       String studentId = _studentIdController.text.trim();
       String password = _passwordController.text;
 
-      print(
-        "Registering User: $name, $email, $studentId, Gender: $_selectedGender, Level: $_selectedLevel",
-      );
+      _register();
 
-      // TODO: Implement actual registration logic (e.g., send data to backend)
     }
   }
 

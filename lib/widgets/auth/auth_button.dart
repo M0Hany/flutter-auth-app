@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class AuthButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String label;
+  final int color;
 
   const AuthButton({
     Key? key,
     required this.onPressed,
-    required this.label
+    required this.label,
+    this.color = 0xFF252EFF,
   }) : super(key: key);
 
   @override
@@ -16,7 +18,7 @@ class AuthButton extends StatelessWidget {
       onPressed: onPressed,
       style: ButtonStyle(
         padding: WidgetStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(vertical: 10, horizontal: 53)),
-        backgroundColor: WidgetStatePropertyAll<Color>(Color(0xFF252EFF)),
+        backgroundColor: WidgetStatePropertyAll<Color>(Color(color)),
       ),
       child: Text(label),
     );

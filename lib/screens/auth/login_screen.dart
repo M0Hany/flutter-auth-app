@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:login/core/utils/validators.dart';
+import 'package:login/services/auth_service.dart';
 import 'package:login/widgets/auth/auth_text_field.dart';
 import 'package:login/widgets/auth/auth_button.dart';
 import 'package:login/widgets/auth/auth_title.dart';
+import 'edit_profile_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,14 +14,24 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+
   String studentId = "";
   String password = "";
+
+  final AuthService _authService = AuthService();
+
+  void _login() async{
+    String message = await _authService.loginUser(studentId, password);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    if (message == "Login successful!") {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => EditProfileScreen()));
+    }
+  }
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      print("Logging in with: $studentId, $password");
-      Navigator.pushNamed(context, '/edit_profile');
+      _login();
     }
   }
 
