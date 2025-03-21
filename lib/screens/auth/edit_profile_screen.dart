@@ -8,8 +8,7 @@ import 'package:login/widgets/auth/auth_title.dart';
 import 'login_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/material.dart';
-import 'dart:io';
+import 'dart:convert';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -83,6 +82,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _profileImage = imageBytes;
       });
       await _authService.updateProfilePicture(imageBytes);
+      _updateProfile();
     }
   }
 
@@ -115,6 +115,45 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         );
       },
     );
+  }
+
+  void _updateProfile() async {
+    final url = Uri.parse('http://10.0.2.2:3000/update-student'); // Use localhost IP for Android emulator
+
+    final request = http.MultipartRequest('PUT', url)
+      ..fields['studentID'] = _studentIdController.text
+      ..fields['name'] = _nameController.text
+      ..fields['email'] = _emailController.text;
+
+    if (_profileImage != null) {
+      final profilePic = http.MultipartFile.fromBytes(
+        'image',
+        _profileImage!,
+        filename: 'profile_picture.jpg',
+      );
+      request.files.add(profilePic);
+    }
+
+    try {
+      final response = await request.send();
+
+      if (response.statusCode == 200) {
+        final responseData = await response.stream.bytesToString();
+        final decodedResponse = json.decode(responseData);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(decodedResponse['message'])));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => EditProfileScreen()),
+        );
+      } else {
+        final responseData = await response.stream.bytesToString();
+        final decodedResponse = json.decode(responseData);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(decodedResponse['message'])));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update profile')));
+      print("Error: $e");
+    }
   }
 
   @override

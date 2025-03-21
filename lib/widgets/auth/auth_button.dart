@@ -6,11 +6,11 @@ class AuthButton extends StatelessWidget {
   final int color;
 
   const AuthButton({
-    Key? key,
+    super.key,
     required this.onPressed,
     required this.label,
     this.color = 0xFF252EFF,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

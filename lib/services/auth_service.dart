@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:flutter/services.dart';
 import 'package:hive_ce/hive.dart';
 import '../models/user_model.dart';
@@ -14,6 +13,10 @@ class AuthService {
     }
     userBox.put(id, User(name: name,  gender: gender ?? '', email: email, id: id, level: level ?? '', password: password));
     return "User registered successfully!";
+  }
+
+  Future<void> saveUserLocally(User user) async {
+    await userBox.put(user.id, user); // Saving user to Hive with their username as key
   }
 
   // Login User

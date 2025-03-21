@@ -7,12 +7,12 @@ class AuthRadio extends StatelessWidget {
   final Function(String) onChanged;
 
   const AuthRadio({
-    Key? key,
+    super.key,
     required this.title,
     required this.value,
     required this.groupValue,
     required this.onChanged
-  }): super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

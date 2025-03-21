@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:login/core/utils/validators.dart';
+import 'package:login/models/user_model.dart';
 import 'package:login/widgets/auth/auth_button.dart';
 import 'package:login/widgets/auth/auth_dropdown.dart';
 import 'package:login/widgets/auth/auth_radio.dart';
@@ -7,8 +8,12 @@ import 'package:login/widgets/auth/auth_text_field.dart';
 import 'package:login/widgets/auth/auth_title.dart';
 import '../../services/auth_service.dart';
 import 'login_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
+
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
 }
@@ -26,17 +31,48 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final AuthService _authService = AuthService();
 
   void _register() async {
-    String message = await _authService.registerUser(
-        _nameController.text,
-        _selectedGender,
-        _emailController.text,
-        _studentIdController.text,
-        _selectedLevel,
-        _passwordController.text,
+    final url = Uri.parse(
+      'http://10.0.2.2:3000/signup',
+    ); // Replace with your backend URL
+
+    print("Registering");
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'name': _nameController.text,
+        'gender': _selectedGender,
+        'email': _emailController.text,
+        'studentID': _studentIdController.text,
+        'level': _selectedLevel,
+        'password': _passwordController.text,
+      }),
     );
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-    if (message == "User registered successfully!") {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginScreen()));
+
+    final responseData = json.decode(response.body);
+
+    if (response.statusCode == 201) {
+      User newUser = User(
+        name: _nameController.text,
+        gender: _selectedGender,
+        id: _studentIdController.text,
+        password: _passwordController.text,
+        email: _emailController.text,
+        level: _selectedLevel
+      );
+      _authService.saveUserLocally(newUser);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(responseData['message'])));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => LoginScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(responseData['message'])));
     }
   }
 
@@ -54,7 +90,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       // Form is valid, retrieve values
@@ -64,7 +99,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       String password = _passwordController.text;
 
       _register();
-
     }
   }
 
@@ -148,6 +182,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     setState(() {
                       _selectedLevel = newValue;
                     });
+                    print("Selected Level: $_selectedLevel");
                   },
                 ),
                 SizedBox(height: 18),

@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
 import 'package:hive_ce/hive.dart';
 
 part 'user_model.g.dart';

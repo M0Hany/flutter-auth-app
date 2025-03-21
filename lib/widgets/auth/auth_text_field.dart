@@ -11,7 +11,7 @@ class AuthTextField extends StatelessWidget {
   final String? initialValue;
 
   const AuthTextField({
-    Key? key,
+    super.key,
     this.hintText,
     this.isPassword = false,
     this.controller,
@@ -20,7 +20,7 @@ class AuthTextField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.isEnabled,
     this.initialValue,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
