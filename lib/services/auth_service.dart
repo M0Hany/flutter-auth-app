@@ -83,4 +83,41 @@ class AuthService {
     ByteData bytes = await rootBundle.load("assets/images/default.jpg");
     return bytes.buffer.asUint8List();
   }
+
+  Future<void> updateProfileDetails(
+      {String? name, String? gender, String? email, String? password, String? id, String? level}) async {
+    String? username = getLoggedInUsername();
+    if (username != null) {
+      User? user = userBox.get(username);
+      if (user != null) {
+        user = User(
+          id: user.id,
+          password: password ?? user.password,
+          email: email ?? user.email,
+          level: level ?? user.level,
+          gender: gender ?? user.gender,
+          name: name ?? user.name,
+          profilePicture: user.profilePicture, // Save new image
+        );
+        await userBox.put(username, user);
+      }
+    }
+  }
+
+  Future<bool> validateOldPassword(String oldPassword) async {
+    User? loggedInUser = getUser();
+    if (loggedInUser == null) {
+      return false;  // No user logged in
+    }
+    return loggedInUser.password == oldPassword;
+  }
+
+  Future<void> updateUserPassword(String newPassword) async {
+    User? loggedInUser = getUser();
+    if (loggedInUser != null) {
+      loggedInUser.password = newPassword;
+      final box = await Hive.openBox('userBox');
+      await box.put(loggedInUser.id, loggedInUser);
+    }
+  }
 }

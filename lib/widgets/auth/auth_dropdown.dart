@@ -5,23 +5,32 @@ class AuthDropdown extends StatelessWidget {
   final String? label;
   final String? hintText;
   final List<String> items;
-  final Function(String) onChanged;
+  final ValueChanged<String?>? onChanged;
+  final String? value;
+  final bool? isEnabled;
+
   const AuthDropdown({
     super.key,
-    required this.onChanged,
+    this.onChanged,
     required this.items,
     this.label,
     this.hintText,
+    this.value,
+    this.isEnabled = true,
   });
+
 
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
-      value: null,
+      value: value,
       decoration: InputDecoration(
         hintText: hintText,
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(40)),
-            borderSide: const BorderSide(color: Color(0xFF252EFF), width: 2.0)
+            borderSide: BorderSide(
+                color: isEnabled! ? Color(0xFF252EFF) : Color(0xFF808080),
+                width: 2.0
+            )
         ),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(40)),
             borderSide: const BorderSide(color: Color(0xFF252EFF), width: 2.0)
@@ -39,9 +48,7 @@ class AuthDropdown extends StatelessWidget {
         child: Text("$label $item"),
       ))
           .toList(),
-      onChanged: (newValue) {
-        onChanged;
-      }
+      onChanged: onChanged,
     );
   }
 }

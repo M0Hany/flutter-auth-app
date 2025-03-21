@@ -4,14 +4,14 @@ class AuthRadio extends StatelessWidget {
   final String title;
   final String value;
   final String groupValue;
-  final Function(String) onChanged;
+  final ValueChanged<String?>? onChanged;
 
   const AuthRadio({
     super.key,
     required this.title,
     required this.value,
     required this.groupValue,
-    required this.onChanged
+    this.onChanged,
   });
 
   @override
@@ -19,13 +19,9 @@ class AuthRadio extends StatelessWidget {
     return Row(
       children: [
         Radio<String>(
-            value: value,
-            groupValue: groupValue,
-            onChanged: (newValue) {
-              if (newValue != null) {
-                onChanged(newValue);
-              }
-            },
+          value: value,
+          groupValue: groupValue,
+          onChanged: onChanged,
           activeColor: Color(0xFF252EFF),
         ),
         Text(title, style: TextStyle(fontSize: 16)),

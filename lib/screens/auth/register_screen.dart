@@ -28,6 +28,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
+  String _selectedGender = "";
+  String _selectedLevel = "";
+
   final AuthService _authService = AuthService();
 
   void _register() async {
@@ -35,7 +38,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       'http://10.0.2.2:3000/signup',
     ); // Replace with your backend URL
 
-    print("Registering");
 
     final response = await http.post(
       url,
@@ -76,9 +78,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  String _selectedGender = "";
-  String _selectedLevel = "";
-
   @override
   void dispose() {
     // Dispose controllers to free memory
@@ -92,12 +91,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      // Form is valid, retrieve values
-      String name = _nameController.text.trim();
-      String email = _emailController.text.trim();
-      String studentId = _studentIdController.text.trim();
-      String password = _passwordController.text;
-
       _register();
     }
   }
@@ -141,7 +134,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       groupValue: _selectedGender,
                       onChanged: (newValue) {
                         setState(() {
-                          _selectedGender = newValue;
+                          _selectedGender = newValue!;
                         });
                       },
                     ),
@@ -151,7 +144,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       groupValue: _selectedGender,
                       onChanged: (newValue) {
                         setState(() {
-                          _selectedGender = newValue;
+                          _selectedGender = newValue!;
                         });
                       },
                     ),
@@ -180,9 +173,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   label: "Level",
                   onChanged: (newValue) {
                     setState(() {
-                      _selectedLevel = newValue;
+                      _selectedLevel = newValue!;
                     });
-                    print("Selected Level: $_selectedLevel");
                   },
                 ),
                 SizedBox(height: 18),

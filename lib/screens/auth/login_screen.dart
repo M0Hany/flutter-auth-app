@@ -52,7 +52,6 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       // Handle connection errors
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to connect to the server')));
-      print("Error: $e");
     }
   }
 

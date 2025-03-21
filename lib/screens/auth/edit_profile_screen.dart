@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:login/models/user_model.dart';
 import 'package:login/services/auth_service.dart';
 import 'package:login/widgets/auth/auth_button.dart';
+import 'package:login/widgets/auth/auth_dropdown.dart';
+import 'package:login/widgets/auth/auth_radio.dart';
 import 'package:login/widgets/auth/auth_text_field.dart';
 import 'package:login/widgets/auth/auth_title.dart';
 import 'login_screen.dart';
@@ -23,6 +25,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _nameController =  TextEditingController();
   final _emailController = TextEditingController();
   final _studentIdController = TextEditingController();
+  String  _selectedGender = '';
+  String  _selectedLevel = '';
+
 
   bool inEdit = false;
   User? user;
@@ -54,6 +59,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _nameController.text = user!.name;
         _emailController.text = user!.email;
         _studentIdController.text = user!.id;
+        _selectedGender = user!.gender;
+        _selectedLevel = user!.level;
       });
     }
   }
@@ -123,7 +130,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final request = http.MultipartRequest('PUT', url)
       ..fields['studentID'] = _studentIdController.text
       ..fields['name'] = _nameController.text
-      ..fields['email'] = _emailController.text;
+      ..fields['email'] = _emailController.text
+      ..fields['gender'] = _selectedGender
+      .. fields['level'] = _selectedLevel;
+
+    _authService.updateProfileDetails(
+      name: _nameController.text,
+      email: _emailController.text,
+      id:  _studentIdController.text,
+      level: _selectedLevel,
+      gender: _selectedGender
+    );
 
     if (_profileImage != null) {
       final profilePic = http.MultipartFile.fromBytes(
@@ -152,7 +169,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update profile')));
-      print("Error: $e");
     }
   }
 
@@ -179,38 +195,118 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                   SizedBox(height: 18),
                   AuthTextField(
-                    isEnabled: inEdit,
-                    controller: _nameController,
+                    isEnabled: false,
+                    controller: _studentIdController,
                   ),
                   SizedBox(height: 18),
                   AuthTextField(
-                    isEnabled: inEdit,
+                    isEnabled: false,
                     controller: _emailController,
                   ),
                   SizedBox(height: 18),
                   AuthTextField(
                     isEnabled: inEdit,
-                    controller: _studentIdController,
+                    controller: _nameController,
                   ),
                   SizedBox(height: 18),
+                  AuthDropdown(
+                    onChanged: inEdit ? (newValue) {
+                      setState(() {
+                        _selectedLevel = newValue!;
+                      });
+                    } : null,
+                    items: ["1", "2", "3", "4"],
+                    hintText: "Select Your Level",
+                    label: "Level",
+                    isEnabled: inEdit,
+                    value: _selectedLevel.isEmpty ? null : _selectedLevel,
+                  ),
+                  SizedBox(height: 18),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Select Gender:",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      AuthButton(
-                          color: 0xFFFF0000,
-                          onPressed: _logout,
-                          label: "Logout"
+                      AuthRadio(
+                        title: "Male",
+                        value: "Male",
+                        groupValue: _selectedGender,
+                        onChanged: inEdit ? (newValue) {
+                          setState(() {
+                            _selectedGender = newValue!;
+                          });
+                        } : null,
                       ),
-                      AuthButton(
-                          onPressed: () {
-                            setState(() {
-                              inEdit = !inEdit;
-                            });
-                          },
-                          label: "Edit"
+                      AuthRadio(
+                        title: "Female",
+                        value: "Female",
+                        groupValue: _selectedGender,
+                        onChanged: inEdit ? (newValue) {
+                          setState(() {
+                            _selectedGender = newValue!;
+                          });
+                        } : null,
                       ),
                     ],
-                  )
+                  ),
+                  SizedBox(height: 18),
+                  Visibility(
+                    visible: !inEdit,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        AuthButton(
+                            color: 0xFFFF0000,
+                            onPressed: _logout,
+                            label: "Logout"
+                        ),
+                        AuthButton(
+                            onPressed: () {
+                              setState(() {
+                                inEdit = !inEdit;
+                              });
+                            },
+                            label: "Edit"
+                        ),
+                      ],
+                    ),
+                  ),
+                  Visibility(
+                    visible: inEdit,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        AuthButton(
+                            color: 0xFFFF0000,
+                            onPressed: (){
+                              setState(() {
+                                inEdit = !inEdit;
+                              });
+                              _loadUserData();
+                            },
+                            label: "Cancel"
+                        ),
+                        AuthButton(
+                            onPressed: _updateProfile,
+                            label: "Confirm"
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 18),
+                  SizedBox(
+                    width: double.infinity,
+                    child: AuthButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, "/change_password");
+                        },
+                        label: "Change Password",
+                    ),
+                  ),
                 ],
               )
           ),
